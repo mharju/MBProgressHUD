@@ -114,6 +114,8 @@ static const CGFloat kDetailsLabelFontSize = 12.f;
 @synthesize detailsLabelText;
 @synthesize progress;
 @synthesize size;
+@synthesize labelTextColor;
+@synthesize progressIndicatorTintColor;
 #if NS_BLOCKS_AVAILABLE
 @synthesize completionBlock;
 #endif
@@ -201,6 +203,9 @@ static const CGFloat kDetailsLabelFontSize = 12.f;
 		
 		taskInProgress = NO;
 		rotationTransform = CGAffineTransformIdentity;
+        
+        self.labelTextColor = [UIColor whiteColor];
+        self.progressIndicatorTintColor = [UIColor whiteColor];
 		
 		[self setupLabels];
 		[self updateIndicators];
@@ -450,7 +455,7 @@ static const CGFloat kDetailsLabelFontSize = 12.f;
 	label.textAlignment = MBLabelAlignmentCenter;
 	label.opaque = NO;
 	label.backgroundColor = [UIColor clearColor];
-	label.textColor = [UIColor whiteColor];
+	label.textColor = self.labelTextColor;
 	label.font = self.labelFont;
 	label.text = self.labelText;
 	[self addSubview:label];
@@ -461,7 +466,7 @@ static const CGFloat kDetailsLabelFontSize = 12.f;
 	detailsLabel.textAlignment = MBLabelAlignmentCenter;
 	detailsLabel.opaque = NO;
 	detailsLabel.backgroundColor = [UIColor clearColor];
-	detailsLabel.textColor = [UIColor whiteColor];
+	detailsLabel.textColor = self.labelTextColor;
 	detailsLabel.numberOfLines = 0;
 	detailsLabel.font = self.detailsLabelFont;
 	detailsLabel.text = self.detailsLabelText;
@@ -478,6 +483,7 @@ static const CGFloat kDetailsLabelFontSize = 12.f;
 		[indicator removeFromSuperview];
 		self.indicator = MB_AUTORELEASE([[UIActivityIndicatorView alloc]
 										 initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge]);
+        ((UIActivityIndicatorView*)self.indicator).color = self.progressIndicatorTintColor;
 		[(UIActivityIndicatorView *)indicator startAnimating];
 		[self addSubview:indicator];
 	}
@@ -664,7 +670,7 @@ static const CGFloat kDetailsLabelFontSize = 12.f;
 
 - (NSArray *)observableKeypaths {
 	return [NSArray arrayWithObjects:@"mode", @"customView", @"labelText", @"labelFont", 
-			@"detailsLabelText", @"detailsLabelFont", @"progress", nil];
+			@"detailsLabelText", @"detailsLabelFont", @"progress", @"labelTextColor", @"progressIndicatorTintColor", nil];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
@@ -691,7 +697,12 @@ static const CGFloat kDetailsLabelFontSize = 12.f;
 			[(id)indicator setProgress:progress];
 		}
 		return;
-	}
+	} else if ([keyPath isEqualToString:@"labelTextColor"]) {
+        label.textColor = self.labelTextColor;
+        detailsLabel.textColor = self.labelTextColor;
+    } else if ([keyPath isEqualToString:@"progressIndicatorTintColor"]) {
+        ((UIActivityIndicatorView*)indicator).color = self.progressIndicatorTintColor;
+    }
 	[self setNeedsLayout];
 	[self setNeedsDisplay];
 }
@@ -715,7 +726,7 @@ static const CGFloat kDetailsLabelFontSize = 12.f;
 	} else if ([superview isKindOfClass:[UIWindow class]]) {
 		[self setTransformForCurrentOrientation:YES];
 	} else {
-		self.frame = self.superview.bounds;
+		self.bounds = self.superview.bounds;
 		[self setNeedsDisplay];
 	}
 }

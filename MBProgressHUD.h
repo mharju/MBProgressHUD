@@ -408,6 +408,16 @@ typedef void (^MBProgressHUDCompletionBlock)();
  */
 @property (assign, getter = isSquare) BOOL square;
 
+/*
+ * The text color to be used for the label.
+ */
+@property (strong, nonatomic) UIColor* labelTextColor;
+
+/*
+ * Tint color for the UIActivityIndicator for the MBProgressHUDModeIndeterminate
+ */
+@property (strong, nonatomic) UIColor* progressIndicatorTintColor;
+
 @end
 
 
